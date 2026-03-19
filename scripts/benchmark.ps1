@@ -4,38 +4,36 @@ $sizes        = @(100, 500, 1000, 2000)
 $threadCounts = @(2, 4, 8)
 $numProcs     = 4
 $optLevels    = @("-O0", "-O1", "-O2", "-O3", "-Os")
-$basePath     = $PSScriptRoot
+$srcPath  = Join-Path $PSScriptRoot '..\src'
+$buildPath = Join-Path $PSScriptRoot '..\build'
+
+# Crear carpeta build si no existe
+if (!(Test-Path $buildPath)) {
+    New-Item -ItemType Directory -Path $buildPath | Out-Null
+}
 
 # ================================================================
 #  COMPILACION
 # ================================================================
 Write-Host "Compilando todas las versiones..." -ForegroundColor Cyan
 
-# --- Serial con -O2 (referencia base) ---
-Push-Location "$basePath\Matriz_Serial"
-gcc -O2 -Wall -Wextra -o multmat_serial.exe multmat_serial.c
-if ($LASTEXITCODE -ne 0) { Write-Error "Fallo compilacion Serial -O2"; exit 1 }
-
-# --- Serial con cada nivel de optimizacion ---
+# Crear bin de serial con todas las optimizaciones
+Write-Host "Compilando Serial con varios niveles de optimizacion..." -ForegroundColor Gray
 foreach ($opt in $optLevels) {
     $tag = $opt.Replace("-","")
-    gcc $opt -Wall -Wextra -o "multmat_serial_$tag.exe" multmat_serial.c
+    gcc $opt -Wall -Wextra -o "$buildPath\multmat_serial_$tag.exe" "$srcPath\serial\multmat_serial.c"
     if ($LASTEXITCODE -ne 0) { Write-Error "Fallo compilacion Serial $opt"; exit 1 }
-    Write-Host "  Serial $opt -> OK" -ForegroundColor DarkGray
 }
-Pop-Location
 
-# --- Threads ---
-Push-Location "$basePath\Matriz_Threads"
-gcc -O2 -Wall -Wextra -pthread -o multmat_threads.exe multmat_threads.c
+# Threads
+Write-Host "Compilando Threads..." -ForegroundColor Gray
+gcc -O2 -Wall -Wextra -pthread -o "$buildPath\multmat_threads.exe" "$srcPath\threads\multmat_threads.c"
 if ($LASTEXITCODE -ne 0) { Write-Error "Fallo compilacion Threads"; exit 1 }
-Pop-Location
 
-# --- Procesos ---
-Push-Location "$basePath\Matriz_Procesos"
-gcc -O2 -Wall -Wextra -o multmat_procesos.exe multmat_procesos.c
+# Procesos
+Write-Host "Compilando Procesos..." -ForegroundColor Gray
+gcc -O2 -Wall -Wextra -o "$buildPath\multmat_procesos.exe" "$srcPath\processes\multmat_procesos.c"
 if ($LASTEXITCODE -ne 0) { Write-Error "Fallo compilacion Procesos"; exit 1 }
-Pop-Location
 
 Write-Host "Compilacion exitosa.`n" -ForegroundColor Green
 
@@ -58,8 +56,8 @@ function Parse-Output($lines) {
 function Draw-SpeedupChart {
     param(
         [string]$title,
-        [array]$labels,   # nombres de cada barra
-        [array]$values,    # speedup numerico
+        [array]$labels,
+        [array]$values,
         [int]$chartWidth = 50
     )
 
@@ -74,7 +72,7 @@ function Draw-SpeedupChart {
         $lbl = $labels[$i].PadRight(22)
         $val = $values[$i]
         $barLen = [math]::Max(1, [math]::Round($val / $maxVal * $chartWidth))
-        $bar = ([string][char]0x2588) * $barLen   # bloque lleno Unicode
+        $bar = ([string][char]0x2588) * $barLen
         $color = if ($val -ge 3) { "Green" } elseif ($val -ge 1.5) { "Yellow" } else { "Red" }
         Write-Host ("  {0} |" -f $lbl) -NoNewline
         Write-Host $bar -ForegroundColor $color -NoNewline
@@ -87,8 +85,7 @@ function Draw-SpeedupChart {
 # ================================================================
 #  EJECUCION Y RECOPILACION
 # ================================================================
-$results    = @()
-$speedupAll = @()
+$results = @()
 
 foreach ($N in $sizes) {
     Write-Host ("=" * 72) -ForegroundColor Yellow
@@ -96,7 +93,7 @@ foreach ($N in $sizes) {
     Write-Host ("=" * 72) -ForegroundColor Yellow
 
     # ---- Serial base (-O2) ----
-    $outSerial = & "$basePath\Matriz_Serial\multmat_serial.exe" $N 2>&1
+    $outSerial = & "$buildPath\multmat_serial_O2.exe" $N 2>&1
     $serial    = Parse-Output $outSerial
     $serialBase = $serial.Multiplicacion
 
@@ -107,7 +104,7 @@ foreach ($N in $sizes) {
 
     foreach ($opt in $optLevels) {
         $tag = $opt.Replace("-","")
-        $out = & "$basePath\Matriz_Serial\multmat_serial_$tag.exe" $N 2>&1
+        $out = & "$buildPath\multmat_serial_$tag.exe" $N 2>&1
         $parsed = Parse-Output $out
         $serialOpts[$opt] = $parsed.Multiplicacion
         if ($parsed.Multiplicacion -lt $bestOptTime) {
@@ -119,12 +116,12 @@ foreach ($N in $sizes) {
     # ---- Threads con 2, 4, 8 hilos ----
     $threadResults = @{}
     foreach ($nt in $threadCounts) {
-        $outT = & "$basePath\Matriz_Threads\multmat_threads.exe" $N $nt 2>&1
+        $outT = & "$buildPath\multmat_threads.exe" $N $nt 2>&1
         $threadResults[$nt] = Parse-Output $outT
     }
 
     # ---- Procesos ----
-    $outProcs = & "$basePath\Matriz_Procesos\multmat_procesos.exe" $N $numProcs 2>&1
+    $outProcs = & "$buildPath\multmat_procesos.exe" $N $numProcs 2>&1
     $procs    = Parse-Output $outProcs
 
     # ---- Tabla de tiempos ----
@@ -146,11 +143,10 @@ foreach ($N in $sizes) {
     Write-Host ("{0,-28} {1,15:N3} {2,15:N3} {3,15:N3}" -f "Procesos ($numProcs)", $procs.Llenado, $procs.Multiplicacion, $procs.Total)
     Write-Host ""
 
-    # ---- Calcular Speedups (referencia = Serial -O2) ----
+    # ---- Calcular Speedups ----
     $chartLabels = @()
     $chartValues = @()
 
-    # Speedup de cada config de threads
     foreach ($nt in $threadCounts) {
         $tms = $threadResults[$nt].Multiplicacion
         $sp  = if ($tms -gt 0) { [math]::Round($serialBase / $tms, 2) } else { 0 }
@@ -158,12 +154,10 @@ foreach ($N in $sizes) {
         $chartValues += $sp
     }
 
-    # Speedup del mejor nivel de optimizacion serial
     $spBestOpt = if ($bestOptTime -gt 0) { [math]::Round($serialBase / $bestOptTime, 2) } else { 0 }
     $chartLabels += "Serial $bestOptName (mejor)"
     $chartValues += $spBestOpt
 
-    # Speedup de procesos
     $spProcs = if ($procs.Multiplicacion -gt 0) { [math]::Round($serialBase / $procs.Multiplicacion, 2) } else { 0 }
     $chartLabels += "Procesos ($numProcs)"
     $chartValues += $spProcs
@@ -171,7 +165,7 @@ foreach ($N in $sizes) {
     Draw-SpeedupChart -title "CURVA DE SPEEDUP  -  Matriz $N x $N  (base: Serial -O2 = ${serialBase} ms)" `
                       -labels $chartLabels -values $chartValues
 
-    # ---- Acumular resultado para tabla resumen ----
+    # Acumular resultado
     $entry = [PSCustomObject]@{
         N                = $N
         Serial_O2_ms     = $serialBase
@@ -189,7 +183,6 @@ foreach ($N in $sizes) {
     $entry | Add-Member -NotePropertyName "Sp_Procesos"    -NotePropertyValue $spProcs
     $results += $entry
 
-    # ---- Detalle de optimizacion serial ----
     Write-Host "  Detalle compilacion serial por nivel de optimizacion:" -ForegroundColor DarkCyan
     $optLabels = @()
     $optValues = @()
@@ -226,7 +219,7 @@ foreach ($r in $results) {
 }
 Write-Host ""
 
-# ---- Curva final de speedup global (para el tamano mas grande) ----
+# Curva final
 $biggest = $results | Where-Object { $_.N -eq ($sizes | Measure-Object -Maximum).Maximum }
 if ($biggest) {
     $fLabels = @("Threads (2h)", "Threads (4h)", "Threads (8h)", "Serial $($biggest.BestOpt) (mejor)", "Procesos ($numProcs)")

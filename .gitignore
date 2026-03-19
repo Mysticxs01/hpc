@@ -1,0 +1,41 @@
+# Binarios compilados
+*.exe
+*.o
+*.a
+*.so
+*.dll
+*.dylib
+
+# Directorio de build (contiene ejecutables)
+build/
+
+# Editor y IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.user
+
+# Git
+.git/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos de depuración
+*.pdb
+*.gch
+
+# Caché de Python
+__pycache__/
+*.pyc
+
+# node_modules
+node_modules/
+
+# Lock files
+package-lock.json
+yarn.lock
