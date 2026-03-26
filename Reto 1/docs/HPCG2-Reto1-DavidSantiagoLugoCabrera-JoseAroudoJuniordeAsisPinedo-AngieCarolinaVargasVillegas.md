@@ -151,19 +151,42 @@ Entorno de prueba:
 - SO: Windows.
 - Compilacion: `-O3`.
 
-### 4.4 Tabla de resultados
+### 4.4 Pruebas realizadas (10 corridas por configuracion)
 
-| Metodo | Workers | N | Tiempo promedio (s) | Desv. estandar (s) | Mejor tiempo (s) | Speedup | Eficiencia |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Serial | 1 | 200000 | 0.340550 | 0.021201 | 0.320326 | 1.0000 | 1.0000 |
-| Threads | 2 | 200000 | 0.252844 | 0.017542 | 0.241828 | 1.3469 | 0.6734 |
-| Threads | 4 | 200000 | 0.212823 | 0.017482 | 0.190592 | 1.6002 | 0.4000 |
-| Threads | 8 | 200000 | 0.202809 | 0.011062 | 0.191865 | 1.6792 | 0.2099 |
-| Procesos | 2 | 200000 | N/D (Windows) | N/D | N/D | N/D | N/D |
-| Procesos | 4 | 200000 | N/D (Windows) | N/D | N/D | N/D | N/D |
-| Procesos | 8 | 200000 | N/D (Windows) | N/D | N/D | N/D | N/D |
+Comandos utilizados en las corridas:
+
+```bash
+./build/jacobi_serial 200000 2000 1e-20
+./build/jacobi_threads 200000 2000 1e-20 2
+./build/jacobi_threads 200000 2000 1e-20 4
+./build/jacobi_threads 200000 2000 1e-20 8
+```
+
+Para cada configuracion se registraron:
+
+- `Iteraciones`
+- `Residual_inf`
+- `Tiempo_s`
+
+Los agregados estadisticos (promedio, desviacion estandar y mejor tiempo) se calculan sobre 10 corridas.
+
+Resultados resumidos trasladados desde `docs/results_reto1_windows.csv`:
+
+```csv
+"Metodo","Workers","N","Promedio_s","Desv_s","Mejor_s","Speedup","Eficiencia"
+"Serial","1","200000","0,34055","0,021201","0,320326","1","1"
+"Threads","2","200000","0,252844","0,017542","0,241828","1,3469","0,6734"
+"Threads","4","200000","0,212823","0,017482","0,190592","1,6002","0,4"
+"Threads","8","200000","0,202809","0,011062","0,191865","1,6792","0,2099"
+```
 
 Nota: la version `fork` no se pudo ejecutar en Windows nativo por dependencia de APIs POSIX (`mmap`, `fork`, barreras de proceso compartido). Para medir procesos, se requiere Linux o WSL con distribucion instalada.
+
+Interpretacion cuantitativa de la tabla:
+
+- La mayor reduccion de tiempo ocurre al pasar de 1 a 2 hilos (`0.3406 s -> 0.2528 s`).
+- El rendimiento mejora con 4 y 8 hilos, pero con retornos decrecientes (`1.6002x` y `1.6792x` de speedup).
+- La desviacion estandar se mantiene baja (entre `0.011` y `0.021 s`), indicando estabilidad razonable en las mediciones.
 
 ## 5. Conclusiones
 
@@ -171,5 +194,16 @@ Nota: la version `fork` no se pudo ejecutar en Windows nativo por dependencia de
 - La version con `pthread` mejora el tiempo frente a serial, con speedup de `1.35x` (2 hilos), `1.60x` (4 hilos) y `1.68x` (8 hilos).
 - La eficiencia cae al aumentar workers (`0.67 -> 0.40 -> 0.21`), lo cual evidencia overhead de sincronizacion por barrera y limite de ancho de banda de memoria.
 - La ganancia de `8` hilos frente a `4` hilos es moderada, por lo que para este tamano de problema una configuracion intermedia puede ofrecer mejor compromiso rendimiento/uso de CPU.
-- La evaluacion de procesos queda pendiente para entorno Linux/WSL; aun asi, por teoria y costos de IPC, se espera que `fork` tenga mayor overhead que `pthread` para granularidad fina por iteracion.
+- La evaluacion de procesos queda documentada como trabajo pendiente en este reporte por restriccion de plataforma (Windows nativo); para cerrarla experimentalmente, debe repetirse el mismo protocolo en Linux/WSL.
+
+### 5.1 Cierre del reto
+
+Con base en las mediciones ejecutadas y la comparacion serial vs hilos, el reto queda cerrado en cuanto a:
+
+- Analisis del algoritmo de Jacobi para Poisson 1D.
+- Implementacion serial y paralela con threads.
+- Evidencia cuantitativa de mejora de desempeno con concurrencia.
+- Discusion tecnica de escalamiento y limitaciones.
+
+La unica extension pendiente para una cobertura total del documento es anexar la tabla experimental de la version por procesos en un entorno Linux/WSL con compilador C disponible.
 
