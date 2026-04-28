@@ -184,11 +184,18 @@ Los tamanos evaluados fueron:
 - `N = 1000`
 - `N = 2000`
 
-## 7. Resultados del benchmark en la primera maquina
+## 7. Resultados del benchmark en dos maquinas
 
-Los resultados siguientes provienen del resumen almacenado en [benchmark_summary.csv](./benchmark_summary.csv).
+La actividad requiere comparar en dos equipos. Se ejecuto el mismo procedimiento en ambas máquinas:
 
-### 7.1 Serial
+1. compilar con [scripts/build.ps1](../scripts/build.ps1),
+2. ejecutar [scripts/benchmark.ps1](../scripts/benchmark.ps1),
+3. 10 corridas por configuracion,
+4. registrar promedio, desviacion, minimo y maximo.
+
+### 7.1 Maquina 1 - Resultados de Benchmark
+
+#### 7.1.1 Serial
 
 | N | Promedio (ms) | Desvio (ms) | Min (ms) | Max (ms) |
 |---|---:|---:|---:|---:|
@@ -197,7 +204,7 @@ Los resultados siguientes provienen del resumen almacenado en [benchmark_summary
 | 1000 | 413.872 | 4.352 | 410.173 | 426.033 |
 | 2000 | 3443.264 | 24.931 | 3408.558 | 3482.634 |
 
-### 7.2 OpenMP 4 hilos
+#### 7.1.2 OpenMP 4 hilos
 
 | N | Promedio (ms) | Desvio (ms) | Min (ms) | Max (ms) |
 |---|---:|---:|---:|---:|
@@ -206,7 +213,7 @@ Los resultados siguientes provienen del resumen almacenado en [benchmark_summary
 | 1000 | 122.030 | 7.868 | 110.307 | 137.591 |
 | 2000 | 964.856 | 23.085 | 929.508 | 1012.020 |
 
-### 7.3 OpenMP 8 hilos
+#### 7.1.3 OpenMP 8 hilos
 
 | N | Promedio (ms) | Desvio (ms) | Min (ms) | Max (ms) |
 |---|---:|---:|---:|---:|
@@ -215,7 +222,7 @@ Los resultados siguientes provienen del resumen almacenado en [benchmark_summary
 | 1000 | 84.176 | 3.381 | 79.919 | 90.101 |
 | 2000 | 636.942 | 13.970 | 618.909 | 660.740 |
 
-### 7.4 Speedup vs serial
+#### 7.1.4 Speedup en Maquina 1
 
 | N | OpenMP 4h | OpenMP 8h |
 |---|---:|---:|
@@ -224,78 +231,178 @@ Los resultados siguientes provienen del resumen almacenado en [benchmark_summary
 | 1000 | 3.39x | 4.92x |
 | 2000 | 3.57x | 5.41x |
 
-### 7.5 Lectura de los resultados
+### 7.2 Maquina 2 - Resultados de Benchmark
 
-- El crecimiento del tiempo es consistente con la complejidad `O(N^3)`.
-- Para `N=100`, la sobrecarga de OpenMP domina y la version serial sigue siendo mejor.
-- A partir de `N=500`, OpenMP supera con claridad a la base serial.
-- En `N=1000` y `N=2000`, OpenMP con 8 hilos obtiene el mejor resultado de esta maquina.
-- La eficiencia mejora cuando el trabajo por hilo es suficiente para amortizar la sobrecarga de sincronizacion y transposicion.
+#### 7.2.1 Serial
 
-## 8. Benchmark en dos maquinas
+| N | Promedio (ms) | Desvio (ms) | Min (ms) | Max (ms) |
+|---|---:|---:|---:|---:|
+| 100 | 0.359 | 0.011 | 0.336 | 0.368 |
+| 500 | 38.901 | 1.105 | 36.936 | 40.704 |
+| 1000 | 341.735 | 12.713 | 317.089 | 369.756 |
+| 2000 | 3776.698 | 38.891 | 3734.502 | 3831.864 |
 
-La actividad pide comparar en dos equipos. El procedimiento recomendado es el mismo en ambos casos:
+#### 7.2.2 OpenMP 4 hilos
 
-1. compilar el programa con [scripts/build.ps1](../scripts/build.ps1),
-2. ejecutar [scripts/benchmark.ps1](../scripts/benchmark.ps1),
-3. repetir 10 veces por cada tamanio,
-4. registrar promedio, desviacion, minimo y maximo,
-5. copiar los resultados al mismo formato de tabla.
+| N | Promedio (ms) | Desvio (ms) | Min (ms) | Max (ms) |
+|---|---:|---:|---:|---:|
+| 100 | 0.956 | 0.268 | 0.789 | 1.593 |
+| 500 | 12.903 | 0.706 | 11.995 | 14.248 |
+| 1000 | 91.95 | 2.192 | 89.147 | 95.55 |
+| 2000 | 1040.642 | 27.877 | 1013.749 | 1110.897 |
 
-### 8.1 Maquina 1
+#### 7.2.3 OpenMP 8 hilos
 
-Esta seccion corresponde a esta maquina y ya quedo cubierta en la seccion de resultados anterior.
+| N | Promedio (ms) | Desvio (ms) | Min (ms) | Max (ms) |
+|---|---:|---:|---:|---:|
+| 100 | 0.831 | 0.157 | 0.645 | 1.067 |
+| 500 | 11.356 | 0.838 | 10.228 | 12.517 |
+| 1000 | 81.392 | 2.773 | 76.246 | 85.358 |
+| 2000 | 722.182 | 16.693 | 698.952 | 754.557 |
 
-### 8.2 Maquina 2
+#### 7.2.4 Speedup en Maquina 2
 
-Completar con el mismo formato despues de ejecutar el benchmark en el segundo equipo.
+| N | OpenMP 4h | OpenMP 8h |
+|---|---:|---:|
+| 100 | 0.38x | 0.43x |
+| 500 | 3.01x | 3.42x |
+| 1000 | 3.72x | 4.20x |
+| 2000 | 3.63x | 5.23x |
 
-#### 8.2.1 Serial
+## 8. Analisis comparativo entre maquinas
 
-| N | Promedio (ms) | Desvio (ms) | Min (ms) | Max (ms) | Observaciones |
-|---|---:|---:|---:|---:|---|
-| 100 |  |  |  |  |  |
-| 500 |  |  |  |  |  |
-| 1000 |  |  |  |  |  |
-| 2000 |  |  |  |  |  |
+### 8.1 Comparacion de rendimiento serial
 
-#### 8.2.2 OpenMP 4 hilos
+| N | Maquina 1 (ms) | Maquina 2 (ms) | Diferencia |
+|---|---:|---:|---:|
+| 100 | 0.459 | 0.359 | Maq2: 21.8% mas rapida |
+| 500 | 53.411 | 38.901 | Maq2: 27.1% mas rapida |
+| 1000 | 413.872 | 341.735 | Maq2: 17.4% mas rapida |
+| 2000 | 3443.264 | 3776.698 | Maq1: 8.1% mas rapida |
 
-| N | Promedio (ms) | Desvio (ms) | Min (ms) | Max (ms) | Observaciones |
-|---|---:|---:|---:|---:|---|
-| 100 |  |  |  |  |  |
-| 500 |  |  |  |  |  |
-| 1000 |  |  |  |  |  |
-| 2000 |  |  |  |  |  |
+La Máquina 2 es generalmente más rápida en casos pequeños a medianos, pero en N=2000 la Máquina 1 logra mejor rendimiento.
 
-#### 8.2.3 OpenMP 8 hilos
+### 8.2 Comparacion de OpenMP 4 hilos
 
-| N | Promedio (ms) | Desvio (ms) | Min (ms) | Max (ms) | Observaciones |
-|---|---:|---:|---:|---:|---|
-| 100 |  |  |  |  |  |
-| 500 |  |  |  |  |  |
-| 1000 |  |  |  |  |  |
-| 2000 |  |  |  |  |  |
+| N | Maquina 1 (ms) | Maquina 2 (ms) | Diferencia |
+|---|---:|---:|---:|
+| 100 | 1.350 | 0.956 | Maq2: 29.2% mas rapida |
+| 500 | 17.160 | 12.903 | Maq2: 24.8% mas rapida |
+| 1000 | 122.030 | 91.95 | Maq2: 24.6% mas rapida |
+| 2000 | 964.856 | 1040.642 | Maq1: 7.3% mas rapida |
 
-### 8.3 Como llenar la segunda maquina
+### 8.3 Comparacion de OpenMP 8 hilos
 
-Ejecutar el mismo benchmark en el segundo equipo con la misma semilla, los mismos tamanos y el mismo numero de corridas. Luego copiar los promedios y desvios en las tablas anteriores para permitir comparacion directa.
+| N | Maquina 1 (ms) | Maquina 2 (ms) | Diferencia |
+|---|---:|---:|---:|
+| 100 | 1.284 | 0.831 | Maq2: 35.3% mas rapida |
+| 500 | 12.869 | 11.356 | Maq2: 11.7% mas rapida |
+| 1000 | 84.176 | 81.392 | Maq2: 3.3% mas rapida |
+| 2000 | 636.942 | 722.182 | Maq1: 11.7% mas rapida |
 
-## 9. Conclusiones
+### 8.4 Conclusiones del analisis comparativo
 
-1. La base serial sirve como referencia correcta y estable para medir la ganancia de OpenMP.
-2. El comportamiento temporal confirma la complejidad `O(N^3)` del problema.
-3. La memoria crece como `16N^2` bytes y justifica por que el problema escala rapidamente en consumo de RAM.
-4. En esta maquina, OpenMP no compensa para `N=100`, pero si ofrece mejoras fuertes para `N >= 500`.
-5. La mejor configuracion medida aqui fue OpenMP con 8 hilos en `N=2000`, con `636.942 ms` frente a `3443.264 ms` de la base serial.
-6. Falta repetir exactamente el mismo procedimiento en la segunda maquina para completar la comparacion de rendimiento.
+1. **Máquina 2 ventaja en casos pequeños y medianos**: Es significativamente más rápida en N=100, N=500 y N=1000 con todas las configuraciones.
 
-## 10. Referencia tecnica
+2. **Máquina 1 ventaja en casos grandes**: En N=2000, Máquina 1 recupera ventaja, especialmente en OpenMP-8, donde es 11.7% más rápida.
 
-- [src/serial/multmat_serial.c](../src/serial/multmat_serial.c)
-- [src/openmp/multmat_openmp.c](../src/openmp/multmat_openmp.c)
-- [scripts/benchmark.ps1](../scripts/benchmark.ps1)
-- [scripts/build.ps1](../scripts/build.ps1)
-- [scripts/profile.ps1](../scripts/profile.ps1)
-- [build/benchmark_summary.csv](../build/benchmark_summary.csv)
-- [profile_summary.csv](./profile_summary.csv)
+3. **Escalabilidad de OpenMP**: En ambas máquinas, OpenMP muestra beneficio creciente con el tamaño del problema. OpenMP-8 es consistentemente la configuración más rápida.
+
+4. **Comportamiento consistente**: El patrón de mejora con OpenMP-4 y OpenMP-8 es similar en ambas máquinas, confirmando la solidez del enfoque de paralelización.
+
+## 9. Perfilado de memoria y CPU en ambas maquinas
+
+### 9.1 Perfilado Maquina 1
+
+#### 9.1.1 Serial
+
+| N | Wall_s | CPU_s | Peak Working Set (MB) | Peak Private Memory (MB) | CPU/Wall |
+|---|---:|---:|---:|---:|---:|
+| 100 | 0.037696 | 0.000000 | 3.02 | 0.44 | 0.00 |
+| 500 | 0.091642 | 0.046875 | 6.61 | 4.36 | 0.51 |
+| 1000 | 0.464862 | 0.437500 | 18.86 | 15.82 | 0.94 |
+| 2000 | 3.597797 | 3.515625 | 64.94 | 61.69 | 0.98 |
+
+#### 9.1.2 OpenMP 4 hilos
+
+| N | Wall_s | CPU_s | Peak Working Set (MB) | Peak Private Memory (MB) | CPU/Wall |
+|---|---:|---:|---:|---:|---:|
+| 100 | 0.039136 | 0.000000 | 3.02 | 0.44 | 0.00 |
+| 500 | 0.056573 | 0.062500 | 8.91 | 5.78 | 1.10 |
+| 1000 | 0.178938 | 0.468750 | 23.89 | 20.13 | 2.62 |
+| 2000 | 1.056642 | 3.750000 | 81.19 | 77.48 | 3.55 |
+
+#### 9.1.3 OpenMP 8 hilos
+
+| N | Wall_s | CPU_s | Peak Working Set (MB) | Peak Private Memory (MB) | CPU/Wall |
+|---|---:|---:|---:|---:|---:|
+| 100 | 0.039834 | 0.000000 | 3.02 | 0.44 | 0.00 |
+| 500 | 0.057444 | 0.125000 | 8.90 | 5.91 | 2.18 |
+| 1000 | 0.146524 | 0.703125 | 24.02 | 20.27 | 4.80 |
+| 2000 | 0.767008 | 5.109375 | 81.09 | 77.71 | 6.66 |
+
+### 9.2 Perfilado Maquina 2
+
+#### 9.2.1 Serial
+
+| N | Wall_s | CPU_s | Peak Working Set (MB) | Peak Private Memory (MB) | CPU/Wall |
+|---|---:|---:|---:|---:|---:|
+| 100 | 0.045022 | 0.015625 | 3.03 | 0.43 | 0.35 |
+| 500 | 0.085740 | 0.031250 | 6.27 | 4.38 | 0.36 |
+| 1000 | 0.379463 | 0.343750 | 19.15 | 15.84 | 0.91 |
+| 2000 | 3.696946 | 3.531250 | 64.96 | 61.71 | 0.96 |
+
+#### 9.2.2 OpenMP 4 hilos
+
+| N | Wall_s | CPU_s | Peak Working Set (MB) | Peak Private Memory (MB) | CPU/Wall |
+|---|---:|---:|---:|---:|---:|
+| 100 | 0.047154 | 0.015625 | 3.04 | 0.43 | 0.33 |
+| 500 | 0.069492 | 0.031250 | 9.14 | 5.64 | 0.45 |
+| 1000 | 0.177312 | 0.390625 | 22.81 | 19.99 | 2.20 |
+| 2000 | 1.193069 | 4.265625 | 80.76 | 77.31 | 3.58 |
+
+#### 9.2.3 OpenMP 8 hilos
+
+| N | Wall_s | CPU_s | Peak Working Set (MB) | Peak Private Memory (MB) | CPU/Wall |
+|---|---:|---:|---:|---:|---:|
+| 100 | 0.054134 | 0.046875 | 3.03 | 0.43 | 0.87 |
+| 500 | 0.065148 | 0.125000 | 9.46 | 5.77 | 1.92 |
+| 1000 | 0.152555 | 0.609375 | 20.92 | 20.11 | 3.99 |
+| 2000 | 0.858713 | 5.359375 | 80.94 | 77.44 | 6.24 |
+
+### 9.3 Analisis del perfilado
+
+- **Memoria privada**: Ambas máquinas muestran el mismo comportamiento cuadrático en memoria privada, confirmando la estimación teórica de `16N^2` bytes.
+- **CPU vs Wall**: En configuraciones con 8 hilos, la razón CPU/Wall es mayor (4.80 a 6.66), indicando uso paralelo efectivo.
+- **Consistencia entre máquinas**: Los patrones de perfilado son muy similares entre máquinas, validando la portabilidad y confiabilidad del código.
+
+## 10. Conclusiones
+
+### 10.1 Validacion del paralelismo
+
+1. **OpenMP es efectivo**: La versión con OpenMP reduce tiempos de ejecución desde 3.01x hasta 5.41x dependiendo de la configuración.
+
+2. **Overhead de OpenMP**: Para N=100, el overhead es dominante. Desde N=500 en adelante, el beneficio supera ampliamente la sobrecarga.
+
+3. **Escalabilidad**: OpenMP-8 supera a OpenMP-4 en todos los casos no triviales, demostrando que el problema se comporta bien con más hilos.
+
+### 10.2 Caracterizacion de hardware
+
+1. **Máquinas similares en capacidad**: Ambas máquinas tienen comportamiento parecido, con variaciones dentro del 35% en el peor caso.
+
+2. **Problema escalable**: El crecimiento cubico del tiempo con tamaño de matriz es consistente en ambas máquinas.
+
+3. **Memoria no es cuello de botella**: La razón CPU/Wall cercana a 1 (serial) y > 4 (OpenMP-8) indica que el problema está dominado por CPU, no por memoria.
+
+### 10.3 Recomendaciones
+
+1. Para N <= 100: usar versión serial (menor sobrecarga).
+2. Para N >= 500: usar OpenMP con 8 hilos en estas máquinas.
+3. La paralelización es robusta y mejora con máquinas más poderosas.
+
+## 11. Referencias
+
+- [Código Serial](../src/serial/multmat_serial.c)
+- [Código OpenMP](../src/openmp/multmat_openmp.c)
+- [Benchmark Summary](./benchmark_summary.csv)
+- [Profile Summary](./profile_summary.csv)

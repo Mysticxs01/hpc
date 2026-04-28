@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPCG1-CE02 - Multiplicacion de Matrices</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Trebuchet MS', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: #f5f5f5;
+            padding: 0;
+        }
+        
+        .page {
+            background: white;
+            padding: 40px 60px;
+            margin: 20px auto;
+            max-width: 900px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            page-break-after: always;
+        }
+        
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            margin: 40px 0;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .cover-page .subtitle {
+            font-size: 32px;
+            margin: 60px 0 40px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .cover-page .group {
+            margin-top: 80px;
+            font-size: 18px;
+        }
+        
+        .cover-page .member {
+            margin: 15px 0;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin: 40px 0 20px;
+            font-size: 32px;
+            page-break-after: avoid;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin: 35px 0 15px;
+            font-size: 24px;
+            page-break-after: avoid;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #7f8c8d;
+            margin: 25px 0 10px;
+            font-size: 18px;
+            page-break-after: avoid;
+        }
+        
+        p {
+            margin: 12px 0;
+            text-align: justify;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+            page-break-inside: avoid;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 14px;
+            text-align: right;
+            font-weight: 600;
+            border: 1px solid #2980b9;
+        }
+        
+        td {
+            padding: 12px 14px;
+            text-align: right;
+            border: 1px solid #bdc3c7;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #ecf0f1;
+        }
+        
+        tr:hover {
+            background-color: #e8f4f8;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
+        }
+        
+        strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        em {
+            color: #7f8c8d;
+        }
+        
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .equation {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-left: 3px solid #3498db;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #ecf0f1;
+            margin: 30px 0;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+            table {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cover-page">
+        <h1>Multiplicacion de Matrices en C</h1>
+        <p class="subtitle">Paralelizacion con OpenMP</p>
+        <p style="font-size: 24px; margin-top: 100px;">HPCG1-CE02</p>
+        <div class="group" style="margin-top: 120px; border-top: 2px solid white; padding-top: 40px;">
+            <p style="font-size: 20px; margin-bottom: 30px; font-weight: 600;">INTEGRANTES</p>
+            <div class="member">David Santiago Lugo Cabrera</div>
+            <div class="member">Jose Aroudo Junior de Asis Pinedo</div>
+            <div class="member">Angie Carolina Vargas Villegas</div>
+        </div>
+    </div>
+<div class="page">
+<h2>1. Objetivo de la actividad</h2>
+<p>El objetivo de esta entrega fue analizar e informar el comportamiento de la **multiplicacion de matrices** en C, incluyendo:</p>
+<ul><li>implementacion base serial,</li></ul>
+<ul><li>implementacion concurrente con OpenMP,</li></ul>
+<ul><li>caracterizacion de CPU y memoria,</li></ul>
+<ul><li>benchmark de desempeno,</li></ul>
+<ul><li>comparacion de resultados en dos equipos,</li></ul>
+<ul><li>y preparacion del documento final para sustentacion.</li></ul>
+<p>En esta version se reportan la base serial en [src/serial/multmat_serial.c](../src/serial/multmat_serial.c) y la version concurrente en [src/openmp/multmat_openmp.c](../src/openmp/multmat_openmp.c).</p>
+<h2>2. Descripcion de la implementacion</h2>
+<p>La base serial realiza la multiplicacion de dos matrices cuadradas `N x N` generadas aleatoriamente. El flujo general es:</p>
+<p>1. reservar memoria para `A`, `B` y `C`,</p>
+<p>2. llenar `A` y `B` con valores aleatorios,</p>
+<p>3. ejecutar el kernel serial de multiplicacion,</p>
+<p>4. imprimir tiempos de llenado, multiplicacion y total.</p>
+<p>La version OpenMP conserva el mismo resultado numerico, pero divide el trabajo por filas entre hilos. Antes de multiplicar, transpone `B` para mejorar la localidad espacial del acceso.</p>
+<p>La medida principal del programa es el tiempo de multiplicacion, porque ese tramo concentra la mayor parte del costo computacional.</p>
+<h2>3. Caracterizacion de CPU</h2>
+<h3>3.1 Complejidad algoritmica</h3>
+<p>El kernel serial usa tres bucles anidados:</p>
+<ul><li>`i` recorre las filas de `A`,</li></ul>
+<ul><li>`j` recorre las columnas de `B`,</li></ul>
+<ul><li>`k` recorre la suma producto.</li></ul>
+<p>Eso produce una complejidad de **$O(N^3)$** en tiempo.</p>
+<h3>3.2 Perfil CPU</h3>
+<p>El consumo de CPU está dominado por:</p>
+<ul><li>operaciones enteras en el bucle interno,</li></ul>
+<ul><li>multiplicaciones y sumas acumuladas en `long long`,</li></ul>
+<ul><li>accesos repetidos a memoria dentro del kernel.</li></ul>
+<p>En la practica, el tiempo de CPU crece de forma cubica con el tamanio de la matriz, por lo que los casos pequenos sirven como linea base y los casos medianos/grandes muestran mejor la carga real del procesador.</p>
+<h3>3.3 Perfilado de CPU medido en esta maquina</h3>
+<p>El benchmark ejecutado en esta maquina con 10 corridas por configuracion arrojo estos tiempos promedio de multiplicacion:</p>
+<table>
+<tr><th>Configuracion</th><th>N=100</th><th>N=500</th><th>N=1000</th><th>N=2000</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>Serial</th><th>0.459 ms</th><th>53.411 ms</th><th>413.872 ms</th><th>3443.264 ms</th></tr>
+<table>
+<tr><th>OpenMP-4</th><th>1.350 ms</th><th>17.160 ms</th><th>122.030 ms</th><th>964.856 ms</th></tr>
+<table>
+<tr><th>OpenMP-8</th><th>1.284 ms</th><th>12.869 ms</th><th>84.176 ms</th><th>636.942 ms</th></tr>
+<p>Interpretacion:</p>
+<ul><li>Para `N=100`, la sobrecarga de OpenMP supera el beneficio.</li></ul>
+<ul><li>Desde `N=500`, OpenMP empieza a mostrar ventaja clara.</li></ul>
+<ul><li>En `N=1000` y `N=2000`, la version de 8 hilos es la mas rapida de esta maquina.</li></ul>
+<h3>3.3 Medicion usada en el informe</h3>
+<p>El programa ya reporta el tiempo de multiplicacion en milisegundos. Para el informe se toman las corridas almacenadas en:</p>
+<ul><li>[benchmark_summary.csv](./benchmark_summary.csv)</li></ul>
+<h2>4. Caracterizacion de memoria</h2>
+<h3>4.1 Uso de memoria por estructura</h3>
+<p>La implementacion serial reserva tres arreglos principales:</p>
+<ul><li>`A`: `N x N` enteros,</li></ul>
+<ul><li>`B`: `N x N` enteros,</li></ul>
+<ul><li>`C`: `N x N` valores `long long`.</li></ul>
+<h3>4.2 Formula de memoria</h3>
+<p>Si un `int` ocupa 4 bytes y un `long long` ocupa 8 bytes, el uso aproximado es:</p>
+<p>$$</p>
+<p>M(N) = 4N^2 + 4N^2 + 8N^2 = 16N^2 \text{ bytes}</p>
+<p>$$</p>
+<p>Esto equivale, aproximadamente, a:</p>
+<ul><li>`N=100`: 160000 bytes, unos 0.15 MiB,</li></ul>
+<ul><li>`N=500`: 4000000 bytes, unos 3.81 MiB,</li></ul>
+<ul><li>`N=1000`: 16000000 bytes, unos 15.26 MiB,</li></ul>
+<ul><li>`N=2000`: 64000000 bytes, unos 61.04 MiB.</li></ul>
+<h3>4.3 Interpretacion</h3>
+<p>La memoria crece de forma cuadratica con `N`, mientras que el tiempo crece de forma cubica. Por eso, en este problema el cuello principal termina siendo CPU y no solo capacidad de almacenamiento.</p>
+<h3>4.4 Perfilado de memoria en esta maquina</h3>
+<p>El consumo teorico estimado para las estructuras del programa es:</p>
+<table>
+<tr><th>N</th><th>Memoria estimada</th></tr>
+<table>
+<tr><th>---</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>160000 bytes (~0.15 MiB)</th></tr>
+<table>
+<tr><th>500</th><th>4000000 bytes (~3.81 MiB)</th></tr>
+<table>
+<tr><th>1000</th><th>16000000 bytes (~15.26 MiB)</th></tr>
+<table>
+<tr><th>2000</th><th>64000000 bytes (~61.04 MiB)</th></tr>
+<p>En la practica, el consumo real del proceso depende del runtime, pero este calculo permite dimensionar el crecimiento del problema y justificar por que el benchmark de `N=2000` ya presiona con mas fuerza el subsistema de memoria.</p>
+<h2>5. Perfilado real de CPU y memoria</h2>
+<p>El perfilado se realizo ejecutando el binario y muestreando el proceso mientras corria. Se midieron estos indicadores:</p>
+<ul><li>`Wall_s`: tiempo total real de ejecucion,</li></ul>
+<ul><li>`CPU_s`: tiempo acumulado de CPU del proceso,</li></ul>
+<ul><li>`PeakWorkingSet_MB`: pico de memoria residente,</li></ul>
+<ul><li>`PeakPrivateMemory_MB`: pico de memoria privada,</li></ul>
+<ul><li>`CPU_to_Wall`: relacion entre CPU y tiempo real, util para ver el uso efectivo de multiples nucleos.</li></ul>
+<p>Los datos provinieron de [profile_summary.csv](./profile_summary.csv).</p>
+<h3>5.1 Perfilado de la base serial</h3>
+<table>
+<tr><th>N</th><th>Wall_s</th><th>CPU_s</th><th>Peak Working Set (MB)</th><th>Peak Private Memory (MB)</th><th>CPU/Wall</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.037696</th><th>0.000000</th><th>3.02</th><th>0.44</th><th>0.00</th></tr>
+<table>
+<tr><th>500</th><th>0.091642</th><th>0.046875</th><th>6.61</th><th>4.36</th><th>0.51</th></tr>
+<table>
+<tr><th>1000</th><th>0.464862</th><th>0.437500</th><th>18.86</th><th>15.82</th><th>0.94</th></tr>
+<table>
+<tr><th>2000</th><th>3.597797</th><th>3.515625</th><th>64.94</th><th>61.69</th><th>0.98</th></tr>
+<h3>5.2 Perfilado de OpenMP con 4 hilos</h3>
+<table>
+<tr><th>N</th><th>Wall_s</th><th>CPU_s</th><th>Peak Working Set (MB)</th><th>Peak Private Memory (MB)</th><th>CPU/Wall</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.039136</th><th>0.000000</th><th>3.02</th><th>0.44</th><th>0.00</th></tr>
+<table>
+<tr><th>500</th><th>0.056573</th><th>0.062500</th><th>8.91</th><th>5.78</th><th>1.10</th></tr>
+<table>
+<tr><th>1000</th><th>0.178938</th><th>0.468750</th><th>23.89</th><th>20.13</th><th>2.62</th></tr>
+<table>
+<tr><th>2000</th><th>1.056642</th><th>3.750000</th><th>81.19</th><th>77.48</th><th>3.55</th></tr>
+<h3>5.3 Perfilado de OpenMP con 8 hilos</h3>
+<table>
+<tr><th>N</th><th>Wall_s</th><th>CPU_s</th><th>Peak Working Set (MB)</th><th>Peak Private Memory (MB)</th><th>CPU/Wall</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.039834</th><th>0.000000</th><th>3.02</th><th>0.44</th><th>0.00</th></tr>
+<table>
+<tr><th>500</th><th>0.057444</th><th>0.125000</th><th>8.90</th><th>5.91</th><th>2.18</th></tr>
+<table>
+<tr><th>1000</th><th>0.146524</th><th>0.703125</th><th>24.02</th><th>20.27</th><th>4.80</th></tr>
+<table>
+<tr><th>2000</th><th>0.767008</th><th>5.109375</th><th>81.09</th><th>77.71</th><th>6.66</th></tr>
+<h3>5.4 Lectura del perfilado</h3>
+<ul><li>La memoria privada pico sube con el tamanio de la matriz, como era esperable por la formula `16N^2`.</li></ul>
+<ul><li>La version serial usa aproximadamente un nucleo completo cuando `N` es grande, porque `CPU_s` y `Wall_s` casi coinciden.</li></ul>
+<ul><li>OpenMP aumenta `CPU_s` porque varios hilos consumen CPU en paralelo; por eso la razon `CPU/Wall` crece con el numero de hilos.</li></ul>
+<ul><li>El mayor pico de memoria aparece en `N=2000`, con alrededor de `61.69 MB` en serial y `77.71 MB` en OpenMP-8.</li></ul>
+<h2>6. Metodologia de benchmark</h2>
+<p>Para conservar comparabilidad se empleo la misma estrategia en todas las corridas:</p>
+<ul><li>mismos ejecutables serial y OpenMP,</li></ul>
+<ul><li>mismos tamanos de matriz,</li></ul>
+<ul><li>10 corridas por configuracion,</li></ul>
+<ul><li>compilacion con optimizacion de compilador `-O2` como base y `-fopenmp` para la version paralela.</li></ul>
+<p>Los tamanos evaluados fueron:</p>
+<ul><li>`N = 100`</li></ul>
+<ul><li>`N = 500`</li></ul>
+<ul><li>`N = 1000`</li></ul>
+<ul><li>`N = 2000`</li></ul>
+<h2>7. Resultados del benchmark en dos maquinas</h2>
+<p>La actividad requiere comparar en dos equipos. Se ejecuto el mismo procedimiento en ambas máquinas:</p>
+<p>1. compilar con [scripts/build.ps1](../scripts/build.ps1),</p>
+<p>2. ejecutar [scripts/benchmark.ps1](../scripts/benchmark.ps1),</p>
+<p>3. 10 corridas por configuracion,</p>
+<p>4. registrar promedio, desviacion, minimo y maximo.</p>
+<h3>7.1 Maquina 1 - Resultados de Benchmark</h3>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>7.1.1 Serial</h4>
+<table>
+<tr><th>N</th><th>Promedio (ms)</th><th>Desvio (ms)</th><th>Min (ms)</th><th>Max (ms)</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.459</th><th>0.013</th><th>0.442</th><th>0.485</th></tr>
+<table>
+<tr><th>500</th><th>53.411</th><th>1.057</th><th>51.357</th><th>54.818</th></tr>
+<table>
+<tr><th>1000</th><th>413.872</th><th>4.352</th><th>410.173</th><th>426.033</th></tr>
+<table>
+<tr><th>2000</th><th>3443.264</th><th>24.931</th><th>3408.558</th><th>3482.634</th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>7.1.2 OpenMP 4 hilos</h4>
+<table>
+<tr><th>N</th><th>Promedio (ms)</th><th>Desvio (ms)</th><th>Min (ms)</th><th>Max (ms)</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>1.350</th><th>0.061</th><th>1.254</th><th>1.466</th></tr>
+<table>
+<tr><th>500</th><th>17.160</th><th>2.043</th><th>15.156</th><th>22.761</th></tr>
+<table>
+<tr><th>1000</th><th>122.030</th><th>7.868</th><th>110.307</th><th>137.591</th></tr>
+<table>
+<tr><th>2000</th><th>964.856</th><th>23.085</th><th>929.508</th><th>1012.020</th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>7.1.3 OpenMP 8 hilos</h4>
+<table>
+<tr><th>N</th><th>Promedio (ms)</th><th>Desvio (ms)</th><th>Min (ms)</th><th>Max (ms)</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>1.284</th><th>0.138</th><th>1.116</th><th>1.608</th></tr>
+<table>
+<tr><th>500</th><th>12.869</th><th>0.275</th><th>12.329</th><th>13.326</th></tr>
+<table>
+<tr><th>1000</th><th>84.176</th><th>3.381</th><th>79.919</th><th>90.101</th></tr>
+<table>
+<tr><th>2000</th><th>636.942</th><th>13.970</th><th>618.909</th><th>660.740</th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>7.1.4 Speedup en Maquina 1</h4>
+<table>
+<tr><th>N</th><th>OpenMP 4h</th><th>OpenMP 8h</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.34x</th><th>0.36x</th></tr>
+<table>
+<tr><th>500</th><th>3.11x</th><th>4.15x</th></tr>
+<table>
+<tr><th>1000</th><th>3.39x</th><th>4.92x</th></tr>
+<table>
+<tr><th>2000</th><th>3.57x</th><th>5.41x</th></tr>
+<h3>7.2 Maquina 2 - Resultados de Benchmark</h3>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>7.2.1 Serial</h4>
+<table>
+<tr><th>N</th><th>Promedio (ms)</th><th>Desvio (ms)</th><th>Min (ms)</th><th>Max (ms)</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.359</th><th>0.011</th><th>0.336</th><th>0.368</th></tr>
+<table>
+<tr><th>500</th><th>38.901</th><th>1.105</th><th>36.936</th><th>40.704</th></tr>
+<table>
+<tr><th>1000</th><th>341.735</th><th>12.713</th><th>317.089</th><th>369.756</th></tr>
+<table>
+<tr><th>2000</th><th>3776.698</th><th>38.891</th><th>3734.502</th><th>3831.864</th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>7.2.2 OpenMP 4 hilos</h4>
+<table>
+<tr><th>N</th><th>Promedio (ms)</th><th>Desvio (ms)</th><th>Min (ms)</th><th>Max (ms)</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.956</th><th>0.268</th><th>0.789</th><th>1.593</th></tr>
+<table>
+<tr><th>500</th><th>12.903</th><th>0.706</th><th>11.995</th><th>14.248</th></tr>
+<table>
+<tr><th>1000</th><th>91.95</th><th>2.192</th><th>89.147</th><th>95.55</th></tr>
+<table>
+<tr><th>2000</th><th>1040.642</th><th>27.877</th><th>1013.749</th><th>1110.897</th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>7.2.3 OpenMP 8 hilos</h4>
+<table>
+<tr><th>N</th><th>Promedio (ms)</th><th>Desvio (ms)</th><th>Min (ms)</th><th>Max (ms)</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.831</th><th>0.157</th><th>0.645</th><th>1.067</th></tr>
+<table>
+<tr><th>500</th><th>11.356</th><th>0.838</th><th>10.228</th><th>12.517</th></tr>
+<table>
+<tr><th>1000</th><th>81.392</th><th>2.773</th><th>76.246</th><th>85.358</th></tr>
+<table>
+<tr><th>2000</th><th>722.182</th><th>16.693</th><th>698.952</th><th>754.557</th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>7.2.4 Speedup en Maquina 2</h4>
+<table>
+<tr><th>N</th><th>OpenMP 4h</th><th>OpenMP 8h</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.38x</th><th>0.43x</th></tr>
+<table>
+<tr><th>500</th><th>3.01x</th><th>3.42x</th></tr>
+<table>
+<tr><th>1000</th><th>3.72x</th><th>4.20x</th></tr>
+<table>
+<tr><th>2000</th><th>3.63x</th><th>5.23x</th></tr>
+<h2>8. Analisis comparativo entre maquinas</h2>
+<h3>8.1 Comparacion de rendimiento serial</h3>
+<table>
+<tr><th>N</th><th>Maquina 1 (ms)</th><th>Maquina 2 (ms)</th><th>Diferencia</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.459</th><th>0.359</th><th>Maq2: 21.8% mas rapida</th></tr>
+<table>
+<tr><th>500</th><th>53.411</th><th>38.901</th><th>Maq2: 27.1% mas rapida</th></tr>
+<table>
+<tr><th>1000</th><th>413.872</th><th>341.735</th><th>Maq2: 17.4% mas rapida</th></tr>
+<table>
+<tr><th>2000</th><th>3443.264</th><th>3776.698</th><th>Maq1: 8.1% mas rapida</th></tr>
+<p>La Máquina 2 es generalmente más rápida en casos pequeños a medianos, pero en N=2000 la Máquina 1 logra mejor rendimiento.</p>
+<h3>8.2 Comparacion de OpenMP 4 hilos</h3>
+<table>
+<tr><th>N</th><th>Maquina 1 (ms)</th><th>Maquina 2 (ms)</th><th>Diferencia</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>1.350</th><th>0.956</th><th>Maq2: 29.2% mas rapida</th></tr>
+<table>
+<tr><th>500</th><th>17.160</th><th>12.903</th><th>Maq2: 24.8% mas rapida</th></tr>
+<table>
+<tr><th>1000</th><th>122.030</th><th>91.95</th><th>Maq2: 24.6% mas rapida</th></tr>
+<table>
+<tr><th>2000</th><th>964.856</th><th>1040.642</th><th>Maq1: 7.3% mas rapida</th></tr>
+<h3>8.3 Comparacion de OpenMP 8 hilos</h3>
+<table>
+<tr><th>N</th><th>Maquina 1 (ms)</th><th>Maquina 2 (ms)</th><th>Diferencia</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>1.284</th><th>0.831</th><th>Maq2: 35.3% mas rapida</th></tr>
+<table>
+<tr><th>500</th><th>12.869</th><th>11.356</th><th>Maq2: 11.7% mas rapida</th></tr>
+<table>
+<tr><th>1000</th><th>84.176</th><th>81.392</th><th>Maq2: 3.3% mas rapida</th></tr>
+<table>
+<tr><th>2000</th><th>636.942</th><th>722.182</th><th>Maq1: 11.7% mas rapida</th></tr>
+<h3>8.4 Conclusiones del analisis comparativo</h3>
+<p>1. **Máquina 2 ventaja en casos pequeños y medianos**: Es significativamente más rápida en N=100, N=500 y N=1000 con todas las configuraciones.</p>
+<p>2. **Máquina 1 ventaja en casos grandes**: En N=2000, Máquina 1 recupera ventaja, especialmente en OpenMP-8, donde es 11.7% más rápida.</p>
+<p>3. **Escalabilidad de OpenMP**: En ambas máquinas, OpenMP muestra beneficio creciente con el tamaño del problema. OpenMP-8 es consistentemente la configuración más rápida.</p>
+<p>4. **Comportamiento consistente**: El patrón de mejora con OpenMP-4 y OpenMP-8 es similar en ambas máquinas, confirmando la solidez del enfoque de paralelización.</p>
+<h2>9. Perfilado de memoria y CPU en ambas maquinas</h2>
+<h3>9.1 Perfilado Maquina 1</h3>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>9.1.1 Serial</h4>
+<table>
+<tr><th>N</th><th>Wall_s</th><th>CPU_s</th><th>Peak Working Set (MB)</th><th>Peak Private Memory (MB)</th><th>CPU/Wall</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.037696</th><th>0.000000</th><th>3.02</th><th>0.44</th><th>0.00</th></tr>
+<table>
+<tr><th>500</th><th>0.091642</th><th>0.046875</th><th>6.61</th><th>4.36</th><th>0.51</th></tr>
+<table>
+<tr><th>1000</th><th>0.464862</th><th>0.437500</th><th>18.86</th><th>15.82</th><th>0.94</th></tr>
+<table>
+<tr><th>2000</th><th>3.597797</th><th>3.515625</th><th>64.94</th><th>61.69</th><th>0.98</th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>9.1.2 OpenMP 4 hilos</h4>
+<table>
+<tr><th>N</th><th>Wall_s</th><th>CPU_s</th><th>Peak Working Set (MB)</th><th>Peak Private Memory (MB)</th><th>CPU/Wall</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.039136</th><th>0.000000</th><th>3.02</th><th>0.44</th><th>0.00</th></tr>
+<table>
+<tr><th>500</th><th>0.056573</th><th>0.062500</th><th>8.91</th><th>5.78</th><th>1.10</th></tr>
+<table>
+<tr><th>1000</th><th>0.178938</th><th>0.468750</th><th>23.89</th><th>20.13</th><th>2.62</th></tr>
+<table>
+<tr><th>2000</th><th>1.056642</th><th>3.750000</th><th>81.19</th><th>77.48</th><th>3.55</th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>9.1.3 OpenMP 8 hilos</h4>
+<table>
+<tr><th>N</th><th>Wall_s</th><th>CPU_s</th><th>Peak Working Set (MB)</th><th>Peak Private Memory (MB)</th><th>CPU/Wall</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.039834</th><th>0.000000</th><th>3.02</th><th>0.44</th><th>0.00</th></tr>
+<table>
+<tr><th>500</th><th>0.057444</th><th>0.125000</th><th>8.90</th><th>5.91</th><th>2.18</th></tr>
+<table>
+<tr><th>1000</th><th>0.146524</th><th>0.703125</th><th>24.02</th><th>20.27</th><th>4.80</th></tr>
+<table>
+<tr><th>2000</th><th>0.767008</th><th>5.109375</th><th>81.09</th><th>77.71</th><th>6.66</th></tr>
+<h3>9.2 Perfilado Maquina 2</h3>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>9.2.1 Serial</h4>
+<table>
+<tr><th>N</th><th>Wall_s</th><th>CPU_s</th><th>Peak Working Set (MB)</th><th>Peak Private Memory (MB)</th><th>CPU/Wall</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.045022</th><th>0.015625</th><th>3.03</th><th>0.43</th><th>0.35</th></tr>
+<table>
+<tr><th>500</th><th>0.085740</th><th>0.031250</th><th>6.27</th><th>4.38</th><th>0.36</th></tr>
+<table>
+<tr><th>1000</th><th>0.379463</th><th>0.343750</th><th>19.15</th><th>15.84</th><th>0.91</th></tr>
+<table>
+<tr><th>2000</th><th>3.696946</th><th>3.531250</th><th>64.96</th><th>61.71</th><th>0.96</th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>9.2.2 OpenMP 4 hilos</h4>
+<table>
+<tr><th>N</th><th>Wall_s</th><th>CPU_s</th><th>Peak Working Set (MB)</th><th>Peak Private Memory (MB)</th><th>CPU/Wall</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.047154</th><th>0.015625</th><th>3.04</th><th>0.43</th><th>0.33</th></tr>
+<table>
+<tr><th>500</th><th>0.069492</th><th>0.031250</th><th>9.14</th><th>5.64</th><th>0.45</th></tr>
+<table>
+<tr><th>1000</th><th>0.177312</th><th>0.390625</th><th>22.81</th><th>19.99</th><th>2.20</th></tr>
+<table>
+<tr><th>2000</th><th>1.193069</th><th>4.265625</th><th>80.76</th><th>77.31</th><th>3.58</th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>9.2.3 OpenMP 8 hilos</h4>
+<table>
+<tr><th>N</th><th>Wall_s</th><th>CPU_s</th><th>Peak Working Set (MB)</th><th>Peak Private Memory (MB)</th><th>CPU/Wall</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th></tr>
+<table>
+<tr><th>100</th><th>0.054134</th><th>0.046875</th><th>3.03</th><th>0.43</th><th>0.87</th></tr>
+<table>
+<tr><th>500</th><th>0.065148</th><th>0.125000</th><th>9.46</th><th>5.77</th><th>1.92</th></tr>
+<table>
+<tr><th>1000</th><th>0.152555</th><th>0.609375</th><th>20.92</th><th>20.11</th><th>3.99</th></tr>
+<table>
+<tr><th>2000</th><th>0.858713</th><th>5.359375</th><th>80.94</th><th>77.44</th><th>6.24</th></tr>
+<h3>9.3 Analisis del perfilado</h3>
+<ul><li>**Memoria privada**: Ambas máquinas muestran el mismo comportamiento cuadrático en memoria privada, confirmando la estimación teórica de `16N^2` bytes.</li></ul>
+<ul><li>**CPU vs Wall**: En configuraciones con 8 hilos, la razón CPU/Wall es mayor (4.80 a 6.66), indicando uso paralelo efectivo.</li></ul>
+<ul><li>**Consistencia entre máquinas**: Los patrones de perfilado son muy similares entre máquinas, validando la portabilidad y confiabilidad del código.</li></ul>
+<h2>10. Conclusiones</h2>
+<h3>10.1 Validacion del paralelismo</h3>
+<p>1. **OpenMP es efectivo**: La versión con OpenMP reduce tiempos de ejecución desde 3.01x hasta 5.41x dependiendo de la configuración.</p>
+<p>2. **Overhead de OpenMP**: Para N=100, el overhead es dominante. Desde N=500 en adelante, el beneficio supera ampliamente la sobrecarga.</p>
+<p>3. **Escalabilidad**: OpenMP-8 supera a OpenMP-4 en todos los casos no triviales, demostrando que el problema se comporta bien con más hilos.</p>
+<h3>10.2 Caracterizacion de hardware</h3>
+<p>1. **Máquinas similares en capacidad**: Ambas máquinas tienen comportamiento parecido, con variaciones dentro del 35% en el peor caso.</p>
+<p>2. **Problema escalable**: El crecimiento cubico del tiempo con tamaño de matriz es consistente en ambas máquinas.</p>
+<p>3. **Memoria no es cuello de botella**: La razón CPU/Wall cercana a 1 (serial) y > 4 (OpenMP-8) indica que el problema está dominado por CPU, no por memoria.</p>
+<h3>10.3 Recomendaciones</h3>
+<p>1. Para N <= 100: usar versión serial (menor sobrecarga).</p>
+<p>2. Para N >= 500: usar OpenMP con 8 hilos en estas máquinas.</p>
+<p>3. La paralelización es robusta y mejora con máquinas más poderosas.</p>
+<h2>11. Referencias</h2>
+<ul><li>[Código Serial](../src/serial/multmat_serial.c)</li></ul>
+<ul><li>[Código OpenMP](../src/openmp/multmat_openmp.c)</li></ul>
+<ul><li>[Benchmark Summary](./benchmark_summary.csv)</li></ul>
+<ul><li>[Profile Summary](./profile_summary.csv)</li></ul>
+<p>Completar con el mismo formato despues de ejecutar el benchmark en el segundo equipo.</p>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>8.2.1 Serial</h4>
+<table>
+<tr><th>N</th><th>Promedio (ms)</th><th>Desvio (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Observaciones</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---</th></tr>
+<table>
+<tr><th>100</th><th></th><th></th><th></th><th></th><th></th></tr>
+<table>
+<tr><th>500</th><th></th><th></th><th></th><th></th><th></th></tr>
+<table>
+<tr><th>1000</th><th></th><th></th><th></th><th></th><th></th></tr>
+<table>
+<tr><th>2000</th><th></th><th></th><th></th><th></th><th></th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>8.2.2 OpenMP 4 hilos</h4>
+<table>
+<tr><th>N</th><th>Promedio (ms)</th><th>Desvio (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Observaciones</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---</th></tr>
+<table>
+<tr><th>100</th><th></th><th></th><th></th><th></th><th></th></tr>
+<table>
+<tr><th>500</th><th></th><th></th><th></th><th></th><th></th></tr>
+<table>
+<tr><th>1000</th><th></th><th></th><th></th><th></th><th></th></tr>
+<table>
+<tr><th>2000</th><th></th><th></th><th></th><th></th><th></th></tr>
+<h4 style='margin-top: 15px; color: #7f8c8d; font-size: 16px;'>8.2.3 OpenMP 8 hilos</h4>
+<table>
+<tr><th>N</th><th>Promedio (ms)</th><th>Desvio (ms)</th><th>Min (ms)</th><th>Max (ms)</th><th>Observaciones</th></tr>
+<table>
+<tr><th>---</th><th>---:</th><th>---:</th><th>---:</th><th>---:</th><th>---</th></tr>
+<table>
+<tr><th>100</th><th></th><th></th><th></th><th></th><th></th></tr>
+<table>
+<tr><th>500</th><th></th><th></th><th></th><th></th><th></th></tr>
+<table>
+<tr><th>1000</th><th></th><th></th><th></th><th></th><th></th></tr>
+<table>
+<tr><th>2000</th><th></th><th></th><th></th><th></th><th></th></tr>
+<h3>8.3 Como llenar la segunda maquina</h3>
+<p>Ejecutar el mismo benchmark en el segundo equipo con la misma semilla, los mismos tamanos y el mismo numero de corridas. Luego copiar los promedios y desvios en las tablas anteriores para permitir comparacion directa.</p>
+<h2>9. Conclusiones</h2>
+<p>1. La base serial sirve como referencia correcta y estable para medir la ganancia de OpenMP.</p>
+<p>2. El comportamiento temporal confirma la complejidad `O(N^3)` del problema.</p>
+<p>3. La memoria crece como `16N^2` bytes y justifica por que el problema escala rapidamente en consumo de RAM.</p>
+<p>4. En esta maquina, OpenMP no compensa para `N=100`, pero si ofrece mejoras fuertes para `N >= 500`.</p>
+<p>5. La mejor configuracion medida aqui fue OpenMP con 8 hilos en `N=2000`, con `636.942 ms` frente a `3443.264 ms` de la base serial.</p>
+<p>6. Falta repetir exactamente el mismo procedimiento en la segunda maquina para completar la comparacion de rendimiento.</p>
+<h2>10. Referencia tecnica</h2>
+<ul><li>[src/serial/multmat_serial.c](../src/serial/multmat_serial.c)</li></ul>
+<ul><li>[src/openmp/multmat_openmp.c](../src/openmp/multmat_openmp.c)</li></ul>
+<ul><li>[scripts/benchmark.ps1](../scripts/benchmark.ps1)</li></ul>
+<ul><li>[scripts/build.ps1](../scripts/build.ps1)</li></ul>
+<ul><li>[scripts/profile.ps1](../scripts/profile.ps1)</li></ul>
+<ul><li>[build/benchmark_summary.csv](../build/benchmark_summary.csv)</li></ul>
+<ul><li>[profile_summary.csv](./profile_summary.csv)</li></ul>
+</div>
+</body>
+</html>
