@@ -1,0 +1,140 @@
+Cellular Automaton Profiling Results
+Generated: mié 29 abr 2026 12:26:43 -05
+
+=== SERIAL VERSION ===
+Grid Width: 10000, Generations: 1000, Runs: 5
+
+=== Cellular Automaton (Serial) ===
+Grid Width: 10000
+Generations: 1000
+Number of Runs: 5
+====================================
+
+Run 1/5... Done (0.0261 s)
+Run 2/5... Done (0.0269 s)
+Run 3/5... Done (0.0262 s)
+Run 4/5... Done (0.0277 s)
+Run 5/5... Done (0.0263 s)
+
+=== Results ===
+Average Time: 0.026639 s
+Min Time: 0.026115 s
+Max Time: 0.027691 s
+Total Time (All Runs): 0.133195 s
+Throughput: 0.3754 B cells/s
+
+=== OPENMP VERSION (Threads: 1) ===
+Grid Width: 10000, Generations: 1000, Runs: 5, Threads: 1
+
+=== Cellular Automaton (OpenMP Parallelized) ===
+Grid Width: 10000
+Generations: 1000
+Number of Runs: 5
+Number of Threads: 1
+=================================================
+
+Run 1/5... Done (0.0262 s)
+Run 2/5... Done (0.0255 s)
+Run 3/5... Done (0.0254 s)
+Run 4/5... Done (0.0253 s)
+Run 5/5... Done (0.0272 s)
+
+=== Results ===
+Average Time: 0.025906 s
+Min Time: 0.025256 s
+Max Time: 0.027199 s
+Total Time (All Runs): 0.129528 s
+Throughput: 0.3860 B cells/s
+
+=== OPENMP VERSION (Threads: 2) ===
+Grid Width: 10000, Generations: 1000, Runs: 5, Threads: 2
+
+=== Cellular Automaton (OpenMP Parallelized) ===
+Grid Width: 10000
+Generations: 1000
+Number of Runs: 5
+Number of Threads: 2
+=================================================
+
+Run 1/5... Done (0.0147 s)
+Run 2/5... Done (0.0133 s)
+Run 3/5... Done (0.0133 s)
+Run 4/5... Done (0.0154 s)
+Run 5/5... Done (0.0132 s)
+
+=== Results ===
+Average Time: 0.013979 s
+Min Time: 0.013236 s
+Max Time: 0.015366 s
+Total Time (All Runs): 0.069894 s
+Throughput: 0.7154 B cells/s
+
+=== OPENMP VERSION (Threads: 4) ===
+Grid Width: 10000, Generations: 1000, Runs: 5, Threads: 4
+
+=== Cellular Automaton (OpenMP Parallelized) ===
+Grid Width: 10000
+Generations: 1000
+Number of Runs: 5
+Number of Threads: 4
+=================================================
+
+Run 1/5... Done (0.0083 s)
+Run 2/5... Done (0.0073 s)
+Run 3/5... Done (0.0086 s)
+Run 4/5... Done (0.0071 s)
+Run 5/5... Done (0.0081 s)
+
+=== Results ===
+Average Time: 0.007874 s
+Min Time: 0.007053 s
+Max Time: 0.008621 s
+Total Time (All Runs): 0.039372 s
+Throughput: 1.2699 B cells/s
+
+=== OPENMP VERSION (Threads: 8) ===
+Grid Width: 10000, Generations: 1000, Runs: 5, Threads: 8
+
+=== Cellular Automaton (OpenMP Parallelized) ===
+Grid Width: 10000
+Generations: 1000
+Number of Runs: 5
+Number of Threads: 8
+=================================================
+
+Run 1/5... Done (0.0049 s)
+Run 2/5... Done (0.0042 s)
+Run 3/5... Done (0.0041 s)
+Run 4/5... Done (0.0042 s)
+Run 5/5... Done (0.0042 s)
+
+=== Results ===
+Average Time: 0.004333 s
+Min Time: 0.004134 s
+Max Time: 0.004906 s
+Total Time (All Runs): 0.021667 s
+Throughput: 2.3077 B cells/s
+
+=== OPENMP VERSION (Threads: 16) ===
+Grid Width: 10000, Generations: 1000, Runs: 5, Threads: 16
+
+=== Cellular Automaton (OpenMP Parallelized) ===
+Grid Width: 10000
+Generations: 1000
+Number of Runs: 5
+Number of Threads: 16
+=================================================
+
+Run 1/5... Done (0.0187 s)
+Run 2/5... Done (0.0061 s)
+Run 3/5... Done (0.0061 s)
+Run 4/5... Done (0.0059 s)
+Run 5/5... Done (0.0055 s)
+
+=== Results ===
+Average Time: 0.008489 s
+Min Time: 0.005517 s
+Max Time: 0.018747 s
+Total Time (All Runs): 0.042447 s
+Throughput: 1.1779 B cells/s
+
